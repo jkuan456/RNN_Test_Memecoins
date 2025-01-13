@@ -141,15 +141,25 @@ print("Model saved as transaction_predictor.h5")
 
 #========================
 # Correlations and Probabilities
-#================
+#=======================
 
 # Predict probability for the test sample
 probabilities = model.predict(X_test)  # Predict probabilities for the first 5 samples
 for i, prob in enumerate(probabilities):
     print(f"Sample {i + 1}: Probability of Buy = {prob[0]:.4f}")
 
+# Testing correlation between predicted probabilities and whether the actual transaction was "Buy" or "Sell"
 
-testData
+x = probabilities
+x = sm.add_constant(x)
+y = testData["Type"].iloc[10:]
+modelO = sm.OLS(y,x)
+results = modelO.fit()
+
+print(results.summary())
+
+# Testing correlation between predicted probabilities and weighted buys and sells
+
 x = probabilities
 x = sm.add_constant(x)
 y = testData['USD Amount'].iloc[10:]*testData["Type"].iloc[10:].apply(lambda x: 1 if x == 1 else -1)
@@ -160,15 +170,8 @@ print(results.summary())
 
 
 
-x = probabilities
-x = sm.add_constant(x)
-y = testData["Type"].iloc[10:]
-modelO = sm.OLS(y,x)
-results = modelO.fit()
 
-print(results.summary())
-
-    
+# Preparing data for export
 
 predictions = (probabilities > 0.5).astype(int)
 print(classification_report(y_test, predictions))
